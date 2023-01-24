@@ -1,1 +1,1 @@
-Comp 2210
+Auburn University COMP 2210 Fundamentals of Computing II
