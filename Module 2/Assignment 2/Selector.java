@@ -35,7 +35,21 @@ public final class Selector {
      * @throws NoSuchElementException   as per above
      */
     public static <T> T min(Collection<T> coll, Comparator<T> comp) {
-        return null;
+        if (coll == null || comp == null) {
+            throw new IllegalArgumentException();
+        }
+        if (coll.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        Iterator<T> iter = coll.iterator();
+        T currMin = iter.next();
+        while (iter.hasNext()) {
+            T curr = iter.next();
+            if (comp.compare(curr, currMin) < 0) {
+                currMin = curr;
+            }
+        }
+        return currMin;
     }
 
     /**
@@ -51,7 +65,21 @@ public final class Selector {
      * @throws NoSuchElementException   as per above
      */
     public static <T> T max(Collection<T> coll, Comparator<T> comp) {
-        return null;
+        if (coll == null || comp == null) {
+            throw new IllegalArgumentException();
+        }
+        if (coll.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        Iterator<T> iter = coll.iterator();
+        T currMax = iter.next();
+        while (iter.hasNext()) {
+            T curr = iter.next();
+            if (comp.compare(curr, currMax) > 0) {
+                currMax = curr;
+            }
+        }
+        return currMax;
     }
 
     /**
@@ -69,7 +97,47 @@ public final class Selector {
      * @throws NoSuchElementException   as per above
      */
     public static <T> T kmin(Collection<T> coll, int k, Comparator<T> comp) {
-        return null;
+        if (coll == null || comp == null) {
+            throw new IllegalArgumentException();
+        }
+        if (coll.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        if (k < 1 || k > coll.size()) {
+            throw new NoSuchElementException();
+        }
+
+        ArrayList<T> list = new ArrayList<T>();
+        Iterator<T> it = coll.iterator();
+        while (it.hasNext()) {
+            list.add(it.next());
+        }
+
+        java.util.Collections.sort(list, comp);
+
+        T curr = list.get(0);
+        int duplicate = -1;
+        if (k == 1) {
+            return curr;
+        }
+
+        for (int i = 1; i < list.size(); i++) {
+            if (list.get(i).equals(curr)) {
+                duplicate++;
+            } else {
+                curr = list.get(i);
+            }
+
+            if (k == i - duplicate) {
+                return curr;
+            }
+        }
+
+        if (list.size() - duplicate - 1 < k) {
+            throw new NoSuchElementException();
+        }
+
+        return curr;
     }
 
     /**
@@ -87,7 +155,48 @@ public final class Selector {
      * @throws NoSuchElementException   as per above
      */
     public static <T> T kmax(Collection<T> coll, int k, Comparator<T> comp) {
-        return null;
+        if (coll == null || comp == null) {
+            throw new IllegalArgumentException();
+        }
+        if (coll.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        if (k < 1 || k > coll.size()) {
+            throw new NoSuchElementException();
+        }
+
+        ArrayList<T> list = new ArrayList<T>();
+        Iterator<T> it = coll.iterator();
+        while (it.hasNext()) {
+            list.add(it.next());
+        }
+
+        java.util.Collections.sort(list, comp);
+        java.util.Collections.reverse(list);
+
+        T curr = list.get(0);
+        int duplicate = -1;
+        if (k == 1) {
+            return curr;
+        }
+
+        for (int i = 1; i < list.size(); i++) {
+            if (list.get(i).equals(curr)) {
+                duplicate++;
+            } else {
+                curr = list.get(i);
+            }
+
+            if (k == i - duplicate) {
+                return curr;
+            }
+        }
+
+        if (list.size() - duplicate - 1 < k) {
+            throw new NoSuchElementException();
+        }
+
+        return curr;
     }
 
     /**
@@ -111,7 +220,27 @@ public final class Selector {
      */
     public static <T> Collection<T> range(Collection<T> coll, T low, T high,
             Comparator<T> comp) {
-        return null;
+        if (coll == null || comp == null) {
+            throw new IllegalArgumentException();
+        }
+        if (coll.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        ArrayList<T> range = new ArrayList<T>();
+
+        Iterator<T> iter = coll.iterator();
+        while (iter.hasNext()) {
+            T curr = iter.next();
+            if (comp.compare(curr, low) >= 0 && comp.compare(curr, high) <= 0) {
+                range.add(curr);
+            }
+        }
+
+        if (range.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return range;
     }
 
     /**
@@ -130,7 +259,31 @@ public final class Selector {
      * @throws NoSuchElementException   as per above
      */
     public static <T> T ceiling(Collection<T> coll, T key, Comparator<T> comp) {
-        return null;
+        if (coll == null || comp == null) {
+            throw new IllegalArgumentException();
+        }
+        if (coll.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        Iterator<T> iter = coll.iterator();
+        T currMin = null;
+        boolean found = false;
+        while (iter.hasNext()) {
+            T curr = iter.next();
+
+            if (!found && comp.compare(curr, key) >= 0) {
+                currMin = curr;
+                found = true;
+            }
+            if (found && comp.compare(curr, currMin) <= 0 && comp.compare(curr, key) >= 0) {
+                currMin = curr;
+                found = true;
+            }
+        }
+        if (found == false) {
+            throw new NoSuchElementException();
+        }
+        return currMin;
     }
 
     /**
@@ -149,7 +302,31 @@ public final class Selector {
      * @throws NoSuchElementException   as per above
      */
     public static <T> T floor(Collection<T> coll, T key, Comparator<T> comp) {
-        return null;
+        if (coll == null || comp == null) {
+            throw new IllegalArgumentException();
+        }
+        if (coll.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        Iterator<T> iter = coll.iterator();
+        T currMax = null;
+        boolean found = false;
+        while (iter.hasNext()) {
+            T curr = iter.next();
+
+            if (!found && comp.compare(curr, key) <= 0) {
+                currMax = curr;
+                found = true;
+            }
+            if (found && comp.compare(curr, currMax) >= 0 && comp.compare(curr, key) <= 0) {
+                currMax = curr;
+                found = true;
+            }
+        }
+        if (found == false) {
+            throw new NoSuchElementException();
+        }
+        return currMax;
     }
 
 }
