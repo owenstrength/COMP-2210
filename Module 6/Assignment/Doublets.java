@@ -31,7 +31,7 @@ public class Doublets implements WordLadderGame {
     // table with chaining).
     /////////////////////////////////////////////////////////////////////////////
 
-    private TreeSet<String> lexicon;
+    private TreeSet<String> lexicon = new TreeSet<String>();
 
     /**
      * Instantiates a new instance of Doublets with the lexicon populated with
@@ -41,7 +41,7 @@ public class Doublets implements WordLadderGame {
      */
     public Doublets(InputStream in) {
         try {
-            lexicon = null;
+            lexicon = new TreeSet<String>();
             Scanner s = new Scanner(new BufferedReader(new InputStreamReader(in)));
             while (s.hasNext()) {
                 String str = s.next();
@@ -61,7 +61,7 @@ public class Doublets implements WordLadderGame {
      * @return number of words in the lexicon
      */
     public int getWordCount() {
-        return 0;
+        return lexicon.size();
     }
 
     /**
@@ -71,7 +71,7 @@ public class Doublets implements WordLadderGame {
      * @return true if str is a word, false otherwise
      */
     public boolean isWord(String str) {
-        return false;
+        return lexicon.contains(str.toUpperCase());
     }
 
     /**
@@ -88,7 +88,19 @@ public class Doublets implements WordLadderGame {
      *         same length, -1 otherwise
      */
     public int getHammingDistance(String str1, String str2) {
-        return 0;
+        int ham = 0;
+        str1 = str1.toUpperCase();
+        str2 = str2.toUpperCase();
+        if (str1.length() != str2.length()) {
+            return -1;
+        }
+        for (int i = 0; i < str1.length(); i++) {
+            if (str1.charAt(i) != str2.charAt(i)) {
+                ham += 1;
+            }
+        }
+        return ham;
+
     }
 
     /**
@@ -99,7 +111,14 @@ public class Doublets implements WordLadderGame {
      * @return the neighbors of the given word
      */
     public List<String> getNeighbors(String word) {
-        return null;
+        List<String> neighbors = new ArrayList<String>();
+
+        for (String fill : lexicon) {
+            if (getHammingDistance(word, fill) == 1)
+                neighbors.add(fill);
+        }
+
+        return neighbors;
     }
 
     /**
@@ -110,7 +129,17 @@ public class Doublets implements WordLadderGame {
      *         false otherwise
      */
     public boolean isWordLadder(List<String> sequence) {
-        return false;
+        if (sequence.isEmpty()) {
+            return false;
+        }
+
+        for (int i = 0; i < sequence.size() - 1; i++) {
+            if (!isWord(sequence.get(i)) || !isWord(sequence.get(i + 1))
+                    || getHammingDistance(sequence.get(i), sequence.get(i + 1)) != 1) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -126,7 +155,72 @@ public class Doublets implements WordLadderGame {
      * @return a minimum length word ladder from start to end
      */
     public List<String> getMinLadder(String start, String end) {
-        return null;
+        List<String> emptyList = new ArrayList<String>();
+
+        if (start == null || end == null) {
+            return emptyList;
+        }
+        if (getHammingDistance(start, end) == -1) {
+            return emptyList;
+        }
+        if (!isWord(start) || !isWord(end)) {
+            return emptyList;
+        }
+
+        start = start.toUpperCase();
+        end = end.toUpperCase();
+        List<String> ladder = new ArrayList<String>();
+
+        if (start.equals(end)) {
+            ladder.add(start);
+            return ladder;
+        }
+
+        ArrayDeque<Node> queue = new ArrayDeque<Node>();
+        HashSet<String> visited = new HashSet<String>();
+
+        Node startNode = new Node(start, null); // Origin vertex
+        visited.add(startNode.position);
+        queue.add(startNode);
+
+        while (!queue.isEmpty()) {
+            Node current = queue.removeFirst();
+            List<String> neighbors = getNeighbors(current.position);
+            for (String neighbor : neighbors) {
+                if (!visited.contains(neighbor)) {
+                    Node neighborNode = new Node(neighbor, current);
+                    visited.add(neighbor);
+                    queue.addLast(neighborNode);
+                    if (neighbor.equals(end)) { // Once end is reached return path
+                        return toList(new Node(neighbor, current));
+                    }
+                }
+            }
+        }
+        return emptyList;
+    }
+
+    private class Node {
+        String position;
+        Node predecessor;
+
+        public Node(String p, Node pred) {
+            position = p;
+            predecessor = pred;
+        }
+    }
+
+    private List<String> toList(Node n) {
+        List<String> list = new ArrayList<String>();
+        String word = n.position;
+        Node prev = n.predecessor;
+        list.add(word);
+        while (prev != null) {
+            word = prev.position;
+            list.add(0, word);
+            prev = prev.predecessor;
+        }
+        return list;
     }
 
 }

@@ -35,10 +35,11 @@ public class ExampleClient {
 
         System.out.println(doublets.isWordLadder(Arrays.asList("cat", "cot", "zot", "dot")));
         System.out.println(doublets.isWordLadder(Arrays.asList("cat", "cot", "pot", "dot")));
+        System.out.println(doublets.isWordLadder(Arrays.asList()));
 
         System.out.println(doublets.getNeighbors("tiger"));
 
-        System.out.println(doublets.getMinLadder("cat", "hat"));
+        System.out.println(doublets.getMinLadder("peanut", "butter"));
     }
 }
 
@@ -56,7 +57,8 @@ public class ExampleClient {
  * 267751
  * false
  * true
+ * false
  * [liger, niger, tiler, timer, titer, tiges]
- * [cat, hat]
+ * []
  * 
  */
